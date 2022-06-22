@@ -205,15 +205,16 @@
 };
 
 &spi0 {
+	status = "okay";
 	pinctrl-names = "default";
 	pinctrl-0 = <&spi0_pins &spi0_cs_pins>;
-	cs-gpios = <&gpio 8 1>, <&gpio 7 1>;
+	cs-gpios = <&gpio 8 1>;
 	spi-display@0{
 		compatible = "adafruit,yx240qv29";
 		reg = <0>;
 		spi-max-frequency = <60000000>;
-		// pinctrl-names = "default";
-		// pinctrl-0 = <&display_pin_ctrl>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&gpio 18 1>;
 		dc-gpios = <&gpio 18 1>;
 		rotation = <90>;
 		// backlight = <&frontpanel>;
