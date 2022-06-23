@@ -72,6 +72,8 @@ static void yx240qv29_enable(struct drm_simple_display_pipe *pipe,
 
 	mipi_dbi_command(dbi, MIPI_DCS_SET_DISPLAY_OFF);
 
+	mipi_dbi_command(dbi, 0xEF, 0x03, 0x80, 0x02);
+
 	mipi_dbi_command(dbi, ILI9341_PWCTRLB, 0x00, 0xc1, 0x30);
 	mipi_dbi_command(dbi, ILI9341_PWRSEQ, 0x64, 0x03, 0x12, 0x81);
 	mipi_dbi_command(dbi, ILI9341_DTCTRLA, 0x85, 0x00, 0x78);
@@ -102,16 +104,23 @@ static void yx240qv29_enable(struct drm_simple_display_pipe *pipe,
 			 0x00, 0x0e, 0x14, 0x03, 0x11, 0x07, 0x31, 0xc1,
 			 0x48, 0x08, 0x0f, 0x0c, 0x31, 0x36, 0x0f);
 
-	/* DDRAM */
-	mipi_dbi_command(dbi, ILI9341_ETMOD, 0x07);
+	mipi_dbi_command(dbi, 0x11);
+	msleep(120);
+	mipi_dbi_command(dbi, 0x29);
+	mipi_dbi_command(dbi, 0x36,0x48);
+	mipi_dbi_command(dbi, 0x36,0x28);
+	
 
-	/* Display */
-	mipi_dbi_command(dbi, ILI9341_DISCTRL, 0x08, 0x82, 0x27, 0x00);
-	mipi_dbi_command(dbi, MIPI_DCS_EXIT_SLEEP_MODE);
-	msleep(100);
+	// /* DDRAM */
+	// mipi_dbi_command(dbi, ILI9341_ETMOD, 0x07);
 
-	mipi_dbi_command(dbi, MIPI_DCS_SET_DISPLAY_ON);
-	msleep(100);
+	// /* Display */
+	// mipi_dbi_command(dbi, ILI9341_DISCTRL, 0x08, 0x82, 0x27, 0x00);
+	// mipi_dbi_command(dbi, MIPI_DCS_EXIT_SLEEP_MODE);
+	// msleep(100);
+
+	// mipi_dbi_command(dbi, MIPI_DCS_SET_DISPLAY_ON);
+	// msleep(100);
 
 out_enable:
 	switch (dbidev->rotation) {

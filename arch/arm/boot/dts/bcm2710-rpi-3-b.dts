@@ -102,8 +102,8 @@
 	};
 	// 8 years ago...
 	// https://github.com/adafruit/adafruit-rpi-fbtft/blob/35890c52f9e3eef3237b76acc295585dd93fc8cd/dts/rpi.dts#L285
-	spi0_tft_pin: spi0_tft_pin {
-		brcm,pins = <13,12>;
+	spi0_dc_pin: spi0_dc_pin {
+		brcm,pins = <13>;
 		brcm,function = <1>; /* output */
 		// brcm,pull = <2>; /* pull up */
 	};
@@ -221,7 +221,7 @@
 		reg = <0>;
 		spi-max-frequency = <60000000>;
 		pinctrl-names = "default";
-		pinctrl-0 = <&spi0_tft_pin>;
+		pinctrl-0 = <&spi0_dc_pin>;
 		dc-gpios = <&gpio 13 1>;
 		reset-gpios = <&gpio 12 0>;
 		rotation = <90>;
