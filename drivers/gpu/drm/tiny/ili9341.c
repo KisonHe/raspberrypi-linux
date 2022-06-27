@@ -54,6 +54,7 @@ static void yx240qv29_enable(struct drm_simple_display_pipe *pipe,
 			     struct drm_crtc_state *crtc_state,
 			     struct drm_plane_state *plane_state)
 {
+	printk("kisonhe::Entering yx240qv29_enable!!!");
 	struct mipi_dbi_dev *dbidev = drm_to_mipi_dbi_dev(pipe->crtc.dev);
 	struct mipi_dbi *dbi = &dbidev->dbi;
 	u8 addr_mode;
