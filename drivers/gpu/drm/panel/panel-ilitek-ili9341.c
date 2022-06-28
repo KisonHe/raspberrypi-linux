@@ -303,6 +303,7 @@ static void ili9341_dpi_init(struct ili9341 *ili)
 	struct ili9341_config *cfg = (struct ili9341_config *)ili->conf;
 
 	/* Power Control */
+	printk("kisonhe::Should Not be Here");
 	mipi_dbi_command_stackbuf(dbi, 0xca, cfg->ca, ILI9341_CA_LEN);
 	mipi_dbi_command_stackbuf(dbi, ILI9341_POWERB, cfg->power_b,
 				  ILI9341_POWER_B_LEN);
