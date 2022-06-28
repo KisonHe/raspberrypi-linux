@@ -219,10 +219,10 @@
 	spi-display@0{
 		compatible = "adafruit,yx240qv29";
 		reg = <0>;
-		spi-max-frequency = <1000000>;
+		spi-max-frequency = <60000000>;
 		pinctrl-names = "default";
 		pinctrl-0 = <&spi0_dc_pin>;
-		dc-gpios = <&gpio 16 1>;
+		dc-gpios = <&gpio 16 0>;
 		reset-gpios = <&gpio 12 0>;
 		rotation = <90>;
 		// backlight = <&frontpanel>;
