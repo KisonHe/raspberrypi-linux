@@ -219,7 +219,7 @@
 	spi-display@0{
 		compatible = "kisonhe,gc9a01_module";
 		reg = <0>;
-		spi-max-frequency = <40000000>;
+		spi-max-frequency = <30000000>;
 		pinctrl-names = "default";
 		pinctrl-0 = <&spi0_dc_pin>;
 		dc-gpios = <&gpio 16 0>;

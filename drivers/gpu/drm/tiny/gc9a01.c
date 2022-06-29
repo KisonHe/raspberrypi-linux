@@ -167,7 +167,7 @@ static const struct drm_simple_display_pipe_funcs gc9a01_pipe_funcs = {
 };
 
 static const struct drm_display_mode gc9a01_module_mode = {
-	DRM_SIMPLE_MODE(240, 320, 37, 49),
+	DRM_SIMPLE_MODE(240, 240, 35, 35),
 };
 
 DEFINE_DRM_GEM_CMA_FOPS(gc9a01_fops);
