@@ -7,7 +7,7 @@
  * Datasheet: https://www.vishay.com/docs/84366/veml6030.pdf
  * Appnote-84367: https://www.vishay.com/docs/84367/designingveml6030.pdf
  */
-
+// !TODO Check if 6030 is compatible with 7700!
 #include <linux/module.h>
 #include <linux/i2c.h>
 #include <linux/err.h>
@@ -511,6 +511,8 @@ static int veml6030_read_raw(struct iio_dev *indio_dev,
 	struct regmap *regmap = data->regmap;
 	struct device *dev = &data->client->dev;
 
+	printk("kisonhe::veml6030_read_raw running");
+
 	switch (mask) {
 	case IIO_CHAN_INFO_RAW:
 	case IIO_CHAN_INFO_PROCESSED:
@@ -793,6 +795,8 @@ static int veml6030_probe(struct i2c_client *client,
 	struct veml6030_data *data;
 	struct iio_dev *indio_dev;
 	struct regmap *regmap;
+
+	printk("kisonhe::veml6030_probe running!");
 
 	if (!i2c_check_functionality(client->adapter, I2C_FUNC_I2C)) {
 		dev_err(&client->dev, "i2c adapter doesn't support plain i2c\n");
