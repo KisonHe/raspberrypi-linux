@@ -6,7 +6,6 @@
 #include "bcm283x-rpi-csi1-2lane.dtsi"
 #include "bcm283x-rpi-i2c0mux_0_44.dtsi"
 #include "bcm271x-rpi-bt.dtsi"
-#include <dt-bindings/interrupt-controller/irq.h>
 
 / {
 	compatible = "raspberrypi,3-model-b", "brcm,bcm2837";
@@ -263,7 +262,6 @@
 	light-sensor@10 {
 		compatible = "vishay,veml6030";
 		reg = <0x10>;
-		interrupts = <12 IRQ_TYPE_LEVEL_LOW>;
 	};
 };
 

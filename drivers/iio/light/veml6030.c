@@ -12,7 +12,6 @@
 #include <linux/i2c.h>
 #include <linux/err.h>
 #include <linux/regmap.h>
-#include <linux/interrupt.h>
 #include <linux/pm_runtime.h>
 #include <linux/iio/iio.h>
 #include <linux/iio/sysfs.h>
@@ -620,105 +619,11 @@ static int veml6030_write_event_val(struct iio_dev *indio_dev,
 	}
 }
 
-static int veml6030_read_interrupt_config(struct iio_dev *indio_dev,
-		const struct iio_chan_spec *chan, enum iio_event_type type,
-		enum iio_event_direction dir)
-{
-	int ret, reg;
-	struct veml6030_data *data = iio_priv(indio_dev);
-
-	ret = regmap_read(data->regmap, VEML6030_REG_ALS_CONF, &reg);
-	if (ret) {
-		dev_err(&data->client->dev,
-				"can't read als conf register %d\n", ret);
-		return ret;
-	}
-
-	if (reg & VEML6030_ALS_INT_EN)
-		return 1;
-	else
-		return 0;
-}
-
-/*
- * Sensor should not be measuring light when interrupt is configured.
- * Therefore correct sequence to configure interrupt functionality is:
- * shut down -> enable/disable interrupt -> power on
- *
- * state = 1 enables interrupt, state = 0 disables interrupt
- */
-static int veml6030_write_interrupt_config(struct iio_dev *indio_dev,
-		const struct iio_chan_spec *chan, enum iio_event_type type,
-		enum iio_event_direction dir, int state)
-{
-	int ret;
-	struct veml6030_data *data = iio_priv(indio_dev);
-
-	if (state < 0 || state > 1)
-		return -EINVAL;
-
-	ret = veml6030_als_shut_down(data);
-	if (ret < 0) {
-		dev_err(&data->client->dev,
-			"can't disable als to configure interrupt %d\n", ret);
-		return ret;
-	}
-
-	/* enable interrupt + power on */
-	ret = regmap_update_bits(data->regmap, VEML6030_REG_ALS_CONF,
-			VEML6030_ALS_INT_EN | VEML6030_ALS_SD, state << 1);
-	if (ret)
-		dev_err(&data->client->dev,
-			"can't enable interrupt & poweron als %d\n", ret);
-
-	return ret;
-}
-
-static const struct iio_info veml6030_info = {
-	.read_raw  = veml6030_read_raw,
-	.write_raw = veml6030_write_raw,
-	.read_event_value = veml6030_read_event_val,
-	.write_event_value	= veml6030_write_event_val,
-	.read_event_config = veml6030_read_interrupt_config,
-	.write_event_config	= veml6030_write_interrupt_config,
-	.attrs = &veml6030_attr_group,
-	.event_attrs = &veml6030_event_attr_group,
-};
-
 static const struct iio_info veml6030_info_no_irq = {
 	.read_raw  = veml6030_read_raw,
 	.write_raw = veml6030_write_raw,
 	.attrs = &veml6030_attr_group,
 };
-
-static irqreturn_t veml6030_event_handler(int irq, void *private)
-{
-	int ret, reg, evtdir;
-	struct iio_dev *indio_dev = private;
-	struct veml6030_data *data = iio_priv(indio_dev);
-
-	ret = regmap_read(data->regmap, VEML6030_REG_ALS_INT, &reg);
-	if (ret) {
-		dev_err(&data->client->dev,
-				"can't read als interrupt register %d\n", ret);
-		return IRQ_HANDLED;
-	}
-
-	/* Spurious interrupt handling */
-	if (!(reg & (VEML6030_INT_TH_HIGH | VEML6030_INT_TH_LOW)))
-		return IRQ_NONE;
-
-	if (reg & VEML6030_INT_TH_HIGH)
-		evtdir = IIO_EV_DIR_RISING;
-	else
-		evtdir = IIO_EV_DIR_FALLING;
-
-	iio_push_event(indio_dev, IIO_UNMOD_EVENT_CODE(IIO_INTENSITY,
-					0, IIO_EV_TYPE_THRESH, evtdir),
-					iio_get_time_ns(indio_dev));
-
-	return IRQ_HANDLED;
-}
 
 /*
  * Set ALS gain to 1/8, integration time to 100 ms, PSM to mode 2,
@@ -823,20 +728,8 @@ static int veml6030_probe(struct i2c_client *client,
 	indio_dev->num_channels = ARRAY_SIZE(veml6030_channels);
 	indio_dev->modes = INDIO_DIRECT_MODE;
 
-	if (client->irq) {
-		ret = devm_request_threaded_irq(&client->dev, client->irq,
-						NULL, veml6030_event_handler,
-						IRQF_TRIGGER_LOW | IRQF_ONESHOT,
-						"veml6030", indio_dev);
-		if (ret < 0) {
-			dev_err(&client->dev,
-					"irq %d request failed\n", client->irq);
-			return ret;
-		}
-		indio_dev->info = &veml6030_info;
-	} else {
 		indio_dev->info = &veml6030_info_no_irq;
-	}
+
 
 	ret = veml6030_hw_init(indio_dev);
 	if (ret < 0)
