@@ -20,6 +20,18 @@ config AK8974
 	  To compile this driver as a module, choose M here: the module
 	  will be called ak8974.
 
+config MT6701
+	tristate "MT6701 Magnetometer"
+	depends on SPI
+	depends on OF
+	select IIO_BUFFER
+	select IIO_TRIGGERED_BUFFER
+	help
+	  Say yes here to build support for MT6701 magnetometer chips.
+
+	  To compile this driver as a module, choose M here: the module
+	  will be called mt6701.
+
 config AK8975
 	tristate "Asahi Kasei AK8975 3-Axis Magnetometer"
 	depends on I2C
